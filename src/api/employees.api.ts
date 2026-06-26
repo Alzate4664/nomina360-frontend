@@ -4,6 +4,20 @@ import type {
   EmployeeListResponse,
 } from '../types/employee.types';
 
+export interface CreateEmployeePayload {
+  firstName: string;
+  lastName: string;
+  documentType: string;
+  documentNumber: string;
+  email?: string | null;
+  phone?: string | null;
+  position: string;
+  department?: string | null;
+  contractType: string;
+  baseSalary: number;
+  startDate: string;
+}
+
 export async function getEmployees(
   page = 1,
   limit = 20,
@@ -22,10 +36,7 @@ export async function getEmployees(
 }
 
 export async function createEmployee(
-  employee: Omit<
-    Employee,
-    'id' | 'companyId' | 'createdAt' | 'updatedAt'
-  >,
+  employee: CreateEmployeePayload,
 ): Promise<Employee> {
   const response = await api.post<Employee>(
     '/employees',

@@ -1,10 +1,12 @@
 ﻿import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, RefreshCw, Users } from 'lucide-react';
 import { getEmployees } from '../api/employees.api';
 import type { Employee } from '../types/employee.types';
 import '../styles/employees.css';
 
 export function EmployeesPage() {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -41,7 +43,7 @@ export function EmployeesPage() {
           </p>
         </div>
 
-        <button className="primary-action">
+        <button className="primary-action" onClick={() => navigate('/employees/new')}>
           <Plus size={19} />
           Nuevo colaborador
         </button>
@@ -174,3 +176,4 @@ export function EmployeesPage() {
     </section>
   );
 }
+

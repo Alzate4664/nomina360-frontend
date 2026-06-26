@@ -10,6 +10,7 @@ import { EmployeesPage } from './pages/EmployeesPage';
 import { LoginPage } from './pages/LoginPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
+import { CreateEmployeePage } from './pages/CreateEmployeePage';
 
 function App() {
   return (
@@ -30,6 +31,11 @@ function App() {
             <Route
               path="/employees"
               element={<EmployeesPage />}
+            />
+            
+            <Route
+            path="/employees/new"
+            element={<CreateEmployeePage />}
             />
 
             <Route
