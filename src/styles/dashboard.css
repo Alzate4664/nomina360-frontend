@@ -234,3 +234,11 @@
     align-self: flex-start;
   }
 }
+
+.dashboard-summary-error {
+  padding: 13px 15px;
+  border: 1px solid #ffc7c7;
+  border-radius: 11px;
+  color: #a51d1d;
+  background: #fff2f2;
+}

@@ -1,4 +1,5 @@
-﻿import {
+﻿import { useEffect, useState } from 'react';
+import {
   ArrowRight,
   Calculator,
   CheckCircle2,
@@ -7,71 +8,89 @@
   Users,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getEmployees } from '../api/employees.api';
 import '../styles/dashboard.css';
-
-const summaryCards = [
-  {
-    title: 'Colaboradores activos',
-    value: '0',
-    description: 'Registrados en la empresa',
-    icon: Users,
-    className: 'blue-card',
-  },
-  {
-    title: 'Novedades pendientes',
-    value: '0',
-    description: 'Por incluir en nómina',
-    icon: ClipboardList,
-    className: 'orange-card',
-  },
-  {
-    title: 'Nóminas procesadas',
-    value: '0',
-    description: 'Durante el mes actual',
-    icon: Calculator,
-    className: 'green-card',
-  },
-  {
-    title: 'Reportes generados',
-    value: '0',
-    description: 'Disponibles para descargar',
-    icon: FileSpreadsheet,
-    className: 'purple-card',
-  },
-];
 
 const quickActions = [
   {
     title: 'Registrar colaborador',
-    description:
-      'Agrega una nueva persona a la empresa.',
-    path: '/employees',
+    description: 'Agrega una nueva persona a la empresa.',
+    path: '/employees/new',
     icon: Users,
   },
   {
     title: 'Crear novedad',
-    description:
-      'Registra horas extra, ausencias o recargos.',
+    description: 'Registra horas extra, ausencias o recargos.',
     path: '/payroll-novelties',
     icon: ClipboardList,
   },
   {
     title: 'Liquidar nómina',
-    description:
-      'Calcula los pagos del periodo actual.',
+    description: 'Calcula los pagos del periodo actual.',
     path: '/payroll',
     icon: Calculator,
   },
   {
     title: 'Generar reporte',
-    description:
-      'Exporta información financiera y laboral.',
+    description: 'Exporta información financiera y laboral.',
     path: '/reports',
     icon: FileSpreadsheet,
   },
 ];
 
 export function DashboardPage() {
+  const [employeeCount, setEmployeeCount] = useState(0);
+  const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+  const [summaryError, setSummaryError] = useState('');
+
+  useEffect(() => {
+    const loadSummary = async () => {
+      try {
+        const response = await getEmployees(1, 1);
+        setEmployeeCount(response.total);
+      } catch {
+        setSummaryError(
+          'No fue posible actualizar el resumen del dashboard.',
+        );
+      } finally {
+        setIsLoadingSummary(false);
+      }
+    };
+
+    void loadSummary();
+  }, []);
+
+  const summaryCards = [
+    {
+      title: 'Colaboradores activos',
+      value: isLoadingSummary ? '...' : String(employeeCount),
+      description: 'Registrados en la empresa',
+      icon: Users,
+      className: 'blue-card',
+    },
+    {
+      title: 'Novedades pendientes',
+      value: '0',
+      description: 'Por incluir en nómina',
+      icon: ClipboardList,
+      className: 'orange-card',
+    },
+    {
+      title: 'Nóminas procesadas',
+      value: '0',
+      description: 'Durante el mes actual',
+      icon: Calculator,
+      className: 'green-card',
+    },
+    {
+      title: 'Reportes generados',
+      value: '0',
+      description: 'Disponibles para descargar',
+      icon: FileSpreadsheet,
+      className: 'purple-card',
+    },
+  ];
+
   return (
     <div className="dashboard-page">
       <section className="dashboard-heading">
@@ -93,6 +112,12 @@ export function DashboardPage() {
           Backend conectado
         </div>
       </section>
+
+      {summaryError && (
+        <div className="dashboard-summary-error">
+          {summaryError}
+        </div>
+      )}
 
       <section className="summary-grid">
         {summaryCards.map((card) => {
