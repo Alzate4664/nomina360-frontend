@@ -11,6 +11,7 @@ import { LoginPage } from './pages/LoginPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { CreateEmployeePage } from './pages/CreateEmployeePage';
+import { PayrollNoveltiesPage } from './pages/PayrollNoveltiesPage';
 
 function App() {
   return (
@@ -39,14 +40,19 @@ function App() {
             />
 
             <Route
-              path="/payroll-novelties"
-              element={
-                <PlaceholderPage
-                  title="Novedades de nómina"
-                  description="Aquí registraremos recargos, horas extra, ausencias y novedades."
-                />
-              }
+            path="/payroll-novelties"
+            element={<PayrollNoveltiesPage />}
             />
+
+            <Route
+            path="/payroll-novelties/new"
+            element={
+              <PlaceholderPage
+               title="Nueva novedad"
+               description="Aquí construiremos el formulario de creación."
+              />
+           }
+           />
 
             <Route
               path="/payroll"
