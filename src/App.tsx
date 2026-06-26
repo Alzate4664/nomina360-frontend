@@ -6,6 +6,7 @@
 } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
+import { EmployeesPage } from './pages/EmployeesPage';
 import { LoginPage } from './pages/LoginPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
@@ -28,12 +29,7 @@ function App() {
 
             <Route
               path="/employees"
-              element={
-                <PlaceholderPage
-                  title="Colaboradores"
-                  description="Aquí administraremos los colaboradores registrados."
-                />
-              }
+              element={<EmployeesPage />}
             />
 
             <Route
