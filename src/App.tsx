@@ -12,6 +12,7 @@ import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { CreateEmployeePage } from './pages/CreateEmployeePage';
 import { PayrollNoveltiesPage } from './pages/PayrollNoveltiesPage';
+import { CreatePayrollNoveltyPage } from './pages/CreatePayrollNoveltyPage';
 
 function App() {
   return (
@@ -46,13 +47,8 @@ function App() {
 
             <Route
             path="/payroll-novelties/new"
-            element={
-              <PlaceholderPage
-               title="Nueva novedad"
-               description="Aquí construiremos el formulario de creación."
-              />
-           }
-           />
+            element={<CreatePayrollNoveltyPage />}
+            />
 
             <Route
               path="/payroll"
