@@ -4,8 +4,10 @@
   Route,
   Routes,
 } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage';
+import { AppLayout } from './layouts/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
+import { LoginPage } from './pages/LoginPage';
+import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 
 function App() {
@@ -18,17 +20,69 @@ function App() {
         />
 
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            element={<DashboardPage />}
-          />
+          <Route element={<AppLayout />}>
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
+
+            <Route
+              path="/employees"
+              element={
+                <PlaceholderPage
+                  title="Colaboradores"
+                  description="Aquí administraremos los colaboradores registrados."
+                />
+              }
+            />
+
+            <Route
+              path="/payroll-novelties"
+              element={
+                <PlaceholderPage
+                  title="Novedades de nómina"
+                  description="Aquí registraremos recargos, horas extra, ausencias y novedades."
+                />
+              }
+            />
+
+            <Route
+              path="/payroll"
+              element={
+                <PlaceholderPage
+                  title="Liquidación de nómina"
+                  description="Aquí se procesarán y consultarán las liquidaciones."
+                />
+              }
+            />
+
+            <Route
+              path="/reports"
+              element={
+                <PlaceholderPage
+                  title="Reportes"
+                  description="Aquí se generarán reportes de nómina y colaboradores."
+                />
+              }
+            />
+
+            <Route
+              path="/audit"
+              element={
+                <PlaceholderPage
+                  title="Auditoría"
+                  description="Aquí se consultará el historial de acciones realizadas."
+                />
+              }
+            />
+          </Route>
         </Route>
 
         <Route
           path="/"
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
               replace
             />
           }
@@ -38,7 +92,7 @@ function App() {
           path="*"
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
               replace
             />
           }
