@@ -1,49 +1,41 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { Plus, RefreshCw, Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, RefreshCw, Users } from 'lucide-react';
 import { getEmployees } from '../api/employees.api';
-import type { Employee } from '../types/employee.types';
 import '../styles/employees.css';
 
 export function EmployeesPage() {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  const loadEmployees = async () => {
-    setIsLoading(true);
-    setError('');
+  const employeesQuery = useQuery({
+    queryKey: ['employees', 'list', 1, 20],
+    queryFn: () => getEmployees(1, 20),
+  });
 
-    try {
-      const response = await getEmployees();
-      setEmployees(response.data);
-    } catch {
-      setError(
-        'No fue posible cargar los colaboradores.',
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void loadEmployees();
-  }, []);
+  const employees = employeesQuery.data?.data ?? [];
+  const total = employeesQuery.data?.total ?? 0;
 
   return (
     <section className="employees-page">
       <div className="employees-heading">
         <div>
-          <span className="eyebrow">Gestión de personal</span>
+          <span className="eyebrow">
+            Gestión de personal
+          </span>
+
           <h1>Colaboradores</h1>
+
           <p>
             Consulta y administra las personas registradas
             en la empresa.
           </p>
         </div>
 
-        <button className="primary-action" onClick={() => navigate('/employees/new')}>
+        <button
+          type="button"
+          className="primary-action"
+          onClick={() => navigate('/employees/new')}
+        >
           <Plus size={19} />
           Nuevo colaborador
         </button>
@@ -52,46 +44,52 @@ export function EmployeesPage() {
       <div className="employees-toolbar">
         <div className="employees-summary">
           <Users size={20} />
+
           <span>
-            {employees.length} colaborador
-            {employees.length === 1 ? '' : 'es'}
+            {total} colaborador{total === 1 ? '' : 'es'}
           </span>
         </div>
 
         <button
+          type="button"
           className="secondary-action"
-          onClick={() => void loadEmployees()}
-          disabled={isLoading}
+          onClick={() => void employeesQuery.refetch()}
+          disabled={employeesQuery.isFetching}
         >
           <RefreshCw
             size={18}
-            className={isLoading ? 'spin' : ''}
+            className={
+              employeesQuery.isFetching ? 'spin' : ''
+            }
           />
+
           Actualizar
         </button>
       </div>
 
       <div className="employees-panel">
-        {isLoading && (
+        {employeesQuery.isPending && (
           <div className="employees-state">
             Cargando colaboradores...
           </div>
         )}
 
-        {!isLoading && error && (
+        {employeesQuery.isError && (
           <div className="employees-state error-state">
-            {error}
+            No fue posible cargar los colaboradores.
           </div>
         )}
 
-        {!isLoading &&
-          !error &&
+        {!employeesQuery.isPending &&
+          !employeesQuery.isError &&
           employees.length === 0 && (
             <div className="employees-state">
               <Users size={42} />
+
               <strong>
                 No hay colaboradores registrados
               </strong>
+
               <p>
                 Registra el primero para comenzar a gestionar
                 la nómina.
@@ -99,8 +97,8 @@ export function EmployeesPage() {
             </div>
           )}
 
-        {!isLoading &&
-          !error &&
+        {!employeesQuery.isPending &&
+          !employeesQuery.isError &&
           employees.length > 0 && (
             <div className="employees-table-wrapper">
               <table className="employees-table">
@@ -123,6 +121,7 @@ export function EmployeesPage() {
                           {employee.firstName}{' '}
                           {employee.lastName}
                         </strong>
+
                         <span>
                           {employee.email || 'Sin correo'}
                         </span>
@@ -135,6 +134,7 @@ export function EmployeesPage() {
 
                       <td>
                         <strong>{employee.position}</strong>
+
                         <span>
                           {employee.department ||
                             'Sin departamento'}
@@ -176,4 +176,3 @@ export function EmployeesPage() {
     </section>
   );
 }
-

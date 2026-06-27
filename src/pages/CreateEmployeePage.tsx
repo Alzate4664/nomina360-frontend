@@ -7,6 +7,7 @@ import { z } from 'zod';
 import axios from 'axios';
 import { createEmployee } from '../api/employees.api';
 import '../styles/employee-form.css';
+import { useQueryClient } from '@tanstack/react-query'; 
 
 const employeeSchema = z.object({
   firstName: z
@@ -63,6 +64,7 @@ type EmployeeFormValues = z.infer<typeof employeeSchema>;
 export function CreateEmployeePage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState('');
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -106,6 +108,10 @@ export function CreateEmployeePage() {
         startDate: new Date(
           `${values.startDate}T00:00:00`,
         ).toISOString(),
+      });
+
+      await queryClient.invalidateQueries({
+       queryKey: ['employees'],
       });
 
       navigate('/employees', {
