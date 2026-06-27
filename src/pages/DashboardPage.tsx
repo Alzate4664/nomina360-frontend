@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useQueries } from '@tanstack/react-query';
 import {
   ArrowRight,
   Calculator,
@@ -59,44 +59,40 @@ const quickActions = [
 ];
 
 export function DashboardPage() {
-  const [employeeCount, setEmployeeCount] = useState(0);
-  const [noveltyCount, setNoveltyCount] = useState(0);
-  const [isLoadingSummary, setIsLoadingSummary] =
-    useState(true);
-  const [summaryError, setSummaryError] = useState('');
-
-  useEffect(() => {
-    const loadSummary = async () => {
-      setIsLoadingSummary(true);
-      setSummaryError('');
-
-      try {
-        const [
-          employeesResponse,
-          noveltiesResponse,
-        ] = await Promise.all([
-          getEmployees(1, 1),
+  const [employeesQuery, noveltiesQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ['employees', 'summary'],
+        queryFn: () => getEmployees(1, 1),
+      },
+      {
+        queryKey: [
+          'payroll-novelties',
+          'summary',
+          currentYear,
+          currentMonth,
+        ],
+        queryFn: () =>
           getPayrollNovelties({
             year: currentYear,
             month: currentMonth,
             page: 1,
             limit: 1,
           }),
-        ]);
+      },
+    ],
+  });
 
-        setEmployeeCount(employeesResponse.total);
-        setNoveltyCount(noveltiesResponse.total);
-      } catch {
-        setSummaryError(
-          'No fue posible actualizar el resumen del dashboard.',
-        );
-      } finally {
-        setIsLoadingSummary(false);
-      }
-    };
+  const employeeCount = employeesQuery.data?.total ?? 0;
+  const noveltyCount = noveltiesQuery.data?.total ?? 0;
 
-    void loadSummary();
-  }, []);
+  const isLoadingSummary =
+    employeesQuery.isPending ||
+    noveltiesQuery.isPending;
+
+  const hasSummaryError =
+    employeesQuery.isError ||
+    noveltiesQuery.isError;
 
   const summaryCards = [
     {
@@ -113,7 +109,8 @@ export function DashboardPage() {
       value: isLoadingSummary
         ? '...'
         : String(noveltyCount),
-      description: `${monthNames[currentMonth - 1]} de ${currentYear}`,
+      description:
+        `${monthNames[currentMonth - 1]} de ${currentYear}`,
       icon: ClipboardList,
       className: 'orange-card',
     },
@@ -155,9 +152,10 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {summaryError && (
+      {hasSummaryError && (
         <div className="dashboard-summary-error">
-          {summaryError}
+          No fue posible actualizar completamente el
+          resumen del dashboard.
         </div>
       )}
 
