@@ -9,7 +9,27 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getEmployees } from '../api/employees.api';
+import { getPayrollNovelties } from '../api/payroll-novelties.api';
 import '../styles/dashboard.css';
+
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth() + 1;
+
+const monthNames = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
 
 const quickActions = [
   {
@@ -21,7 +41,7 @@ const quickActions = [
   {
     title: 'Crear novedad',
     description: 'Registra horas extra, ausencias o recargos.',
-    path: '/payroll-novelties',
+    path: '/payroll-novelties/new',
     icon: ClipboardList,
   },
   {
@@ -40,14 +60,32 @@ const quickActions = [
 
 export function DashboardPage() {
   const [employeeCount, setEmployeeCount] = useState(0);
-  const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+  const [noveltyCount, setNoveltyCount] = useState(0);
+  const [isLoadingSummary, setIsLoadingSummary] =
+    useState(true);
   const [summaryError, setSummaryError] = useState('');
 
   useEffect(() => {
     const loadSummary = async () => {
+      setIsLoadingSummary(true);
+      setSummaryError('');
+
       try {
-        const response = await getEmployees(1, 1);
-        setEmployeeCount(response.total);
+        const [
+          employeesResponse,
+          noveltiesResponse,
+        ] = await Promise.all([
+          getEmployees(1, 1),
+          getPayrollNovelties({
+            year: currentYear,
+            month: currentMonth,
+            page: 1,
+            limit: 1,
+          }),
+        ]);
+
+        setEmployeeCount(employeesResponse.total);
+        setNoveltyCount(noveltiesResponse.total);
       } catch {
         setSummaryError(
           'No fue posible actualizar el resumen del dashboard.',
@@ -63,15 +101,19 @@ export function DashboardPage() {
   const summaryCards = [
     {
       title: 'Colaboradores activos',
-      value: isLoadingSummary ? '...' : String(employeeCount),
+      value: isLoadingSummary
+        ? '...'
+        : String(employeeCount),
       description: 'Registrados en la empresa',
       icon: Users,
       className: 'blue-card',
     },
     {
-      title: 'Novedades pendientes',
-      value: '0',
-      description: 'Por incluir en nómina',
+      title: 'Novedades del periodo',
+      value: isLoadingSummary
+        ? '...'
+        : String(noveltyCount),
+      description: `${monthNames[currentMonth - 1]} de ${currentYear}`,
       icon: ClipboardList,
       className: 'orange-card',
     },
@@ -194,7 +236,9 @@ export function DashboardPage() {
         <div className="period-status">
           <div>
             <span>Periodo actual</span>
-            <strong>Pendiente de configurar</strong>
+            <strong>
+              {monthNames[currentMonth - 1]} de {currentYear}
+            </strong>
           </div>
 
           <div>
@@ -205,8 +249,10 @@ export function DashboardPage() {
           </div>
 
           <div>
-            <span>Última actualización</span>
-            <strong>Sin actividad registrada</strong>
+            <span>Novedades registradas</span>
+            <strong>
+              {isLoadingSummary ? '...' : noveltyCount}
+            </strong>
           </div>
         </div>
       </section>
